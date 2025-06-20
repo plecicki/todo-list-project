@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import { v4 as uuidv4 } from 'uuid';
 
 const App = () => {
-  const [socket, setSocket] = useState();
+  const [socket, setSocket] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [taskName, setTaskName] = useState('');
 
@@ -11,13 +11,22 @@ const App = () => {
     const socket = io('ws://localhost:8000', { transports: ['websocket'] });
     setSocket(socket);
 
+    socket.on('addTask', task => addTask(task));
+    socket.on('removeTask', task => removeTask(task, false));
+    socket.on('updateData', existingTasks => updateTasks(existingTasks));
+
     return () => {
       socket.disconnect();
     };
   }, []);
 
-  const removeTask = id => {
-    setTasks(tasks => tasks.filter(task => task.id !== id));
+  const updateTasks = existingTasks => {
+    setTasks(existingTasks);
+  }
+
+  const removeTask = (task, didICalledIt) => {
+    setTasks(tasks => tasks.filter(thisTask => thisTask.id !== task.id));
+    if (didICalledIt) socket.emit('removeTask', task);
   }
 
   const addTask = task => {
@@ -46,7 +55,7 @@ const App = () => {
         <h2>Tasks</h2>
 
         <ul className="tasks-section__list" id="tasks-list">
-          {tasks.map(task => <li key={task.id} className="task">{task.name} <button className="btn btn--red" onClick={() => removeTask(task.id)}>Remove</button></li>)}
+          {tasks.map(task => <li key={task.id} className="task">{task.name} <button className="btn btn--red" onClick={() => removeTask(task, true)}>Remove</button></li>)}
         </ul>
 
         <form id="add-task-form" onSubmit={submitForm}>
