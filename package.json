@@ -1,0 +1,12 @@
+{
+  "name": "todo-list-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/plecicki/todo-list-project.git",
+  "author": "Piotr Lecicki <p.lecicki@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "4.17.1",
+    "socket.io": "4.7.2"
+  }
+}
